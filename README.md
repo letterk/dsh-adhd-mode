@@ -14,7 +14,7 @@ Upstream is a set of glue scripts, one per runtime. On Claude Code it registers 
 | --- | --- | --- |
 | hook | `SessionStart` hook | `ctx.systemPrompt.section()` with a dynamic `text` |
 | switch | flag file under `~/.claude/` | a `.volatile()` config field, live and persisted |
-| page | none | a settings page and a pill next to the composer |
+| page | none | a settings page and an icon+label trigger in the composer tool row |
 
 ## Changes from upstream
 
@@ -47,7 +47,7 @@ Two places, both in the Web UI:
 
 | Where | What |
 | --- | --- |
-| the pill next to the composer | click to flip |
+| the `ADHD` button in the composer tool row | click to flip |
 | Settings → ADHD output mode | the switch on the page |
 
 The change lands on the next model step and is written to the profile's config, so it survives a restart. There is no command, no tool and nothing to type — the UI is the only control, and the only place to look when the mode is not doing what you expected.
@@ -65,7 +65,7 @@ The switch is profile-wide, not per session. DSH's `PromptSection` takes no sess
 
 ```
 index.js                        host half: the system-prompt hook
-client.js                       client half: composer pill and settings page
+client.js                       client half: composer trigger and settings page
 cordis.patch.yml                loader row that inserts the plugin
 skills/adhd-mode/rules.md       the ruleset, from upstream
 locale/{en,zh}.json             bundle title and description

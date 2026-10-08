@@ -33,8 +33,12 @@ const React = {
   Fragment: 'Fragment',
   useSyncExternalStore(_subscribe, getSnapshot) { return getSnapshot(); },
 };
+const primitives = {
+  IconChecklistOutlineRegular(props) { return createElement('svg', props || {}); },
+};
 const requireStub = (id) => {
   if (id === 'react') return React;
+  if (id === '@deepseek-ai/dsh-client-ui-primitives') return primitives;
   if (id === 'react/jsx-runtime') return { jsx: createElement, jsxs: createElement, Fragment: 'Fragment' };
   throw new Error('unexpected require: ' + id);
 };
@@ -94,9 +98,20 @@ for (const loc of ['zh', 'en']) {
 
 // ---- slot registrations --------------------------------------------------
 check('two slots injected', injectedRoots.length === 2, injectedRoots);
-check('injected conversation.composer.dock', injectedRoots.includes('conversation.composer.dock'), injectedRoots);
+check('injected conversation.input.left', injectedRoots.includes('conversation.input.left'), injectedRoots);
 check('injected settings.section', injectedRoots.includes('settings.section'), injectedRoots);
 check('two components registered', registered.length === 2, registered.length);
+
+// ---- regression guard: the dock seat is invisible on a new Session -------
+// The shipped composer only renders `conversation.composer.dock` for
+// `variant === "composer"`, so the trigger must stay in the tool row.
+const dockUse = src.match(/(?:inject\(|name:\s*)['"]conversation\.composer\.dock['"]/);
+check('source does not register in the composer dock seat', dockUse === null, dockUse && dockUse[0]);
+check('source registers in the composer tool row', /inject\('conversation\.input\.left'/.test(src), 'missing conversation.input.left');
+const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+check('dsh.client.inject declares the primitives package',
+  pkg.dsh.client.inject.includes('@deepseek-ai/dsh-client-ui-primitives'), pkg.dsh.client.inject);
+check('client platform is web', pkg.dsh.client.platform === 'web', pkg.dsh.client);
 
 const byRoot = {};
 injectedRoots.forEach((root, i) => { byRoot[root] = registered[i]; });
@@ -119,11 +134,11 @@ function renderText(node, out) {
 const renders = {};
 for (const loc of ['zh', 'en']) {
   activeLocale = loc;
-  for (const root of ['conversation.composer.dock', 'settings.section']) {
+  for (const root of ['conversation.input.left', 'settings.section']) {
     const comp = byRoot[root].comp;
     let tree = null;
     let err = null;
-    try { tree = comp({ close() {}, session: null }); } catch (e) { err = e; }
+    try { tree = comp({ close() {}, session: null, sessionId: 's1' }); } catch (e) { err = e; }
     check(root + ' renders in ' + loc, err === null && tree !== null, err && String(err));
     const text = [];
     if (tree) renderText(tree, text);
@@ -136,8 +151,9 @@ for (const loc of ['zh', 'en']) {
 const pageZh = renders['zh|settings.section'];
 check('page lists 10 rules (zh)', (pageZh.match(/。/g) || []).length >= 10, pageZh.slice(0, 200));
 check('page shows the ON/OFF state line (zh)', pageZh.includes('已关闭') || pageZh.includes('已开启'), pageZh.slice(0, 200));
-const pillZh = renders['zh|conversation.composer.dock'];
-check('pill shows ADHD mode label (zh)', pillZh.includes('ADHD 模式'), pillZh);
+const triggerZh = renders['zh|conversation.input.left'];
+check('trigger shows the ADHD label (zh)', triggerZh.includes('ADHD'), triggerZh);
+check('trigger label is short (zh)', !triggerZh.includes('模式'), triggerZh);
 
 // ---- every key used by t() exists in both dictionaries ------------------
 const tableZh = dicts['adhd-mode'].zh;

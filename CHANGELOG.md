@@ -8,6 +8,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - Renamed the project from `dsh-i-have-adhd` to `dsh-adhd-mode` — that name is unoccupied on npm and in the plugin market, whereas the old one belongs to an unrelated plugin. The loader row id, the settings namespace and the bundled ruleset path follow the new name.
 - The ruleset's `## Persistence` paragraph no longer tells the reader to say a phrase; it points at the UI switch instead.
+- The composer trigger moved from `conversation.composer.dock` to `conversation.input.left`. The shipped composer only renders the dock for `variant === "composer"`, so a dock entry is invisible until the Session holds a conversation; the tool row renders on the new-Session screen too.
+- The trigger is now an icon plus the short label `ADHD`, styled like the PUA composer trigger, and it reads the shared icon set from `@deepseek-ai/dsh-client-ui-primitives`.
 
 ### Removed
 

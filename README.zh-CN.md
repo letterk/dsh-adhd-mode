@@ -14,7 +14,7 @@
 | --- | --- | --- |
 | hook | `SessionStart` hook | `ctx.systemPrompt.section()`，`text` 用动态函数 |
 | 开关 | `~/.claude/` 下的标志文件 | `.volatile()` 配置字段，改完即生效并持久化 |
-| 界面 | 无 | 设置页 + 输入框旁的胶囊 |
+| 界面 | 无 | 设置页 + 输入框工具栏里的 ADHD 按钮 |
 
 ## 改动在哪
 
@@ -47,7 +47,7 @@ dsh plugin --profile web remove dsh-adhd-mode
 
 | 位置 | 操作 |
 | --- | --- |
-| 输入框旁的胶囊 | 点一下 |
+| 输入框工具栏里的 `ADHD` 按钮 | 点一下 |
 | 设置 → ADHD 输出模式 | 拨开关 |
 
 改完下一轮对话就生效，并写进 profile 配置，重启也还在。没有命令、没有工具、也不用打字——界面是唯一的控制入口，出问题时也只有这一个地方要查。
@@ -65,7 +65,7 @@ dsh plugin --profile web remove dsh-adhd-mode
 
 ```
 index.js                        Host 半边：系统提示词 hook
-client.js                       Client 半边：胶囊和设置页
+client.js                       Client 半边：输入框按钮和设置页
 cordis.patch.yml                插入插件的 loader 行
 skills/adhd-mode/rules.md       上游的规则集
 locale/{en,zh}.json             bundle 的标题和描述
