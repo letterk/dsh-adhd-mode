@@ -1,0 +1,8 @@
+- insert:
+    - id: i-have-adhd
+      name: 'dsh-i-have-adhd'
+      config:
+        enabled: false
+        order: 15
+        registerSkill: true
+        honorStopPhrase: true

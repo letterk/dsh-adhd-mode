@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "ADHD output mode",
+    "description": "Keeps the ayghri/i-have-adhd output rules in the system prompt, with a live switch and a settings page."
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "ADHD 输出模式",
+    "description": "把 ayghri/i-have-adhd 的输出规则常驻注入系统提示词，并提供实时开关与设置页。"
+  }
+}

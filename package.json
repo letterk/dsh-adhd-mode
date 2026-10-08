@@ -1,0 +1,77 @@
+{
+  "name": "dsh-i-have-adhd",
+  "version": "0.1.0",
+  "description": "ADHD-friendly output style for DeepSeek Harness: a system-prompt hook, a live on/off switch, and a settings page.",
+  "license": "MIT",
+  "author": "letterk",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "bundle",
+    "plugin",
+    "adhd",
+    "system-prompt"
+  ],
+  "homepage": "https://github.com/letterk/dsh-i-have-adhd#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/letterk/dsh-i-have-adhd.git"
+  },
+  "bugs": {
+    "url": "https://github.com/letterk/dsh-i-have-adhd/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "main": "index.js",
+  "icon": "icon.svg",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "locale/*.json",
+    "skills/i-have-adhd/SKILL.md",
+    "test/",
+    "README.md",
+    "README.zh-CN.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node test/host.mjs && node test/client.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.0",
+    "@deepseek-ai/schemastery": "^3.18.0"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    },
+    "@deepseek-ai/schemastery": {
+      "optional": true
+    }
+  }
+}
