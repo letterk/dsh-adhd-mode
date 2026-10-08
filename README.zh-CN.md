@@ -18,25 +18,21 @@
 
 ## 安装
 
-走插件管理器，不要手动往 profile 里拷文件。
-
 ```sh
-cd /path/to/dsh-i-have-adhd
-mkdir -p node_modules
-ln -sfn ~/.dsh/profiles/web/node_modules/@deepseek-ai node_modules/@deepseek-ai
+dsh plugin --profile web add dsh-i-have-adhd
 ```
 
+就这一行。`dsh plugin` 把后面的参数原样转成 profile 目录里的 pnpm 命令，下次启动时任何声明了 `dsh.bundle` 的新依赖会被自动提升为 profile 层，不需要再单独启用。装完重启 profile。
+
+pnpm 认的 spec 都能用：
+
 ```sh
-plugin_manager action=install_bundle target=/path/to/dsh-i-have-adhd
-plugin_manager action=set_bundle     target=dsh-i-have-adhd enabled=true
+dsh plugin --profile web add github:letterk/dsh-i-have-adhd
+dsh plugin --profile web add file:/path/to/dsh-i-have-adhd
+dsh plugin --profile web remove dsh-i-have-adhd
 ```
 
-那个软链接是必须的。`install_bundle` 把目录以 `link:` 依赖的形式装进去，而 Node 解析被链接包的裸导入时用的是它的 realpath，所以 `@deepseek-ai/schemastery` 必须能从本目录找到。少了它，行能装上，但激活会失败。
-
-两个容易踩的坑：
-
-- 对已经装过的目录再跑一次 `install_bundle`，只会回你 `ambiguous-install`，不会重试激活。要用 `set_bundle ... enabled=false` 再 `enabled=true` 来回切一次。
-- 有些环境下 `client.js` 不会热加载。改完记得刷新 Web UI 页面。
+要装的是你打算改的工作区，需要多一步，见 [就地编辑安装](#就地编辑安装)。
 
 ## 使用
 
@@ -84,6 +80,26 @@ npm test
 `test/host.mjs` 用一个假的 Cordis context 加载 `index.js`，检查 section、skill、command、监听器的注册情况，`/adhd` 的完整参数表，所有关闭短语，以及写入失败的分支。`test/client.mjs` 用桩浏览器全局量和桩 React 加载 `client.js`，在 `zh` 和 `en` 下各渲染一遍两个座位。
 
 两个测试都不需要 DSH、不需要浏览器，也不需要 `npm install`。
+
+### 就地编辑安装
+
+`file:` 装进去的是副本，profile 会一直用安装时那一版。想让 profile 直接读你的工作区，就改用 link：
+
+```sh
+dsh plugin --profile web add link:/path/to/dsh-i-have-adhd
+```
+
+被链接的 bundle 从它自己的目录被导入，裸导入也就从那里解析，而不是从 profile。所以要给这个 checkout 一个能走到 harness 包的 `node_modules`：
+
+```sh
+cd /path/to/dsh-i-have-adhd
+mkdir -p node_modules
+ln -sfn ~/.dsh/profiles/web/node_modules/@deepseek-ai node_modules/@deepseek-ai
+```
+
+少了它，行装得上，导入会失败：`Cannot find package '@deepseek-ai/schemastery'`。这个软链接在 `.gitignore` 里，新克隆的仓库要重做一次。
+
+有些环境下 `client.js` 不会热加载，改完记得刷新 Web UI 页面。
 
 在 harness 会话里做实时检查：
 

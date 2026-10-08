@@ -18,25 +18,21 @@ Upstream is a set of glue scripts, one per runtime. On Claude Code it registers 
 
 ## Install
 
-Through the plugin manager. Do not copy files into the profile.
-
 ```sh
-cd /path/to/dsh-i-have-adhd
-mkdir -p node_modules
-ln -sfn ~/.dsh/profiles/web/node_modules/@deepseek-ai node_modules/@deepseek-ai
+dsh plugin --profile web add dsh-i-have-adhd
 ```
 
+That is the whole install. `dsh plugin` forwards the rest of the line to pnpm inside the profile, and the next boot promotes any new dependency that declares `dsh.bundle` to a profile layer on its own — there is no second step. Restart the profile afterwards.
+
+Any spec pnpm accepts works:
+
 ```sh
-plugin_manager action=install_bundle target=/path/to/dsh-i-have-adhd
-plugin_manager action=set_bundle     target=dsh-i-have-adhd enabled=true
+dsh plugin --profile web add github:letterk/dsh-i-have-adhd
+dsh plugin --profile web add file:/path/to/dsh-i-have-adhd
+dsh plugin --profile web remove dsh-i-have-adhd
 ```
 
-The symlink is required. `install_bundle` adds the directory as a `link:` dependency, and Node resolves a linked package's bare imports from that package's realpath, so `@deepseek-ai/schemastery` has to be reachable from this directory. Without it the row installs and then fails to activate.
-
-Two things that are easy to trip over:
-
-- Running `install_bundle` again on an already-installed directory answers `ambiguous-install` and does not retry activation. Cycle the bundle with `set_bundle ... enabled=false` and then `enabled=true`.
-- `client.js` is not hot-reloaded in every setup. After editing it, reload the Web UI page.
+Installing from a working tree you intend to edit takes one extra step: see [live-edit install](#live-edit-install).
 
 ## Use
 
@@ -84,6 +80,26 @@ npm test
 `test/host.mjs` loads `index.js` against a fake Cordis context and checks the section, skill, command and listener registrations, the whole `/adhd` argument table, every stop phrase, and the failed-write path. `test/client.mjs` loads `client.js` against stub browser globals and a stub React, then renders both seats in `zh` and `en`.
 
 Neither test needs DSH, a browser, or `npm install`.
+
+### Live-edit install
+
+`file:` installs a copy, so the profile keeps the revision it was installed from. To have the profile read your working tree directly, link it instead:
+
+```sh
+dsh plugin --profile web add link:/path/to/dsh-i-have-adhd
+```
+
+A linked bundle is imported from its own directory, so its bare imports resolve there and not in the profile. Give the checkout a `node_modules` that reaches the harness packages:
+
+```sh
+cd /path/to/dsh-i-have-adhd
+mkdir -p node_modules
+ln -sfn ~/.dsh/profiles/web/node_modules/@deepseek-ai node_modules/@deepseek-ai
+```
+
+Without it the row installs and then fails to import: `Cannot find package '@deepseek-ai/schemastery'`. The link is in `.gitignore`, so a fresh clone has to repeat this once.
+
+`client.js` is not hot-reloaded in every setup; reload the Web UI page after editing it.
 
 Live inspection, from a session inside the harness:
 
