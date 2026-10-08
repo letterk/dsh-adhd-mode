@@ -19,8 +19,8 @@ function check(label, cond, extra) {
 }
 
 // ---- module surface ------------------------------------------------------
-check('name is i-have-adhd', mod.name === 'i-have-adhd', mod.name);
-check('NS is i-have-adhd', mod.NS === 'i-have-adhd', mod.NS);
+check('name is adhd-mode', mod.name === 'adhd-mode', mod.name);
+check('NS is adhd-mode', mod.NS === 'adhd-mode', mod.NS);
 check('inject is exactly [systemPrompt]', JSON.stringify(mod.inject) === JSON.stringify(['systemPrompt']), mod.inject);
 check('Config schema exported', typeof mod.Config === 'function', typeof mod.Config);
 check('apply exported', typeof mod.apply === 'function');
@@ -48,7 +48,7 @@ for (const [label, re] of [
   ['no skill registration', /skills\.register/],
   ['no settings write path', /settings\.update/],
   ['no agent/pre-step listener', /agent\/pre-step/],
-  ['no gesture matching', /GESTURE|i-have-adhd gesture/],
+  ['no gesture matching', /GESTURE|adhd-mode gesture/],
   ['no stop-phrase matching', /honorStopPhrase|STOP_RES/],
   ['no lastUserText helper', /lastUserText/],
 ]) {
@@ -94,7 +94,7 @@ function run(config) {
   check('apply({}) did not throw', rec.err === null, rec.err && String(rec.err));
   check('asks for no other service', rec.injections.length === 0, rec.injections);
   check('exactly one prompt section', rec.sections.length === 1, rec.sections.length);
-  check('section name is the namespace', rec.sections[0].name === 'i-have-adhd', rec.sections[0].name);
+  check('section name is the namespace', rec.sections[0].name === 'adhd-mode', rec.sections[0].name);
   check('section order is 15', rec.sections[0].order === 15, rec.sections[0].order);
   check('section text is "" while disabled', rec.sections[0].text() === '', rec.sections[0].text());
   check('section text is a function (re-evaluated per assembly)', typeof rec.sections[0].text === 'function');

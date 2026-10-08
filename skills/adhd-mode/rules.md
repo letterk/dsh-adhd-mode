@@ -1,14 +1,15 @@
 ---
-name: i-have-adhd
-description: 'Shape output for a reader with ADHD: lead with the next action, number multi-step work, restate state across turns, suppress tangents, give specific time estimates, make wins visible. Invoke with /i-have-adhd; stays on until "stop adhd mode".'
+name: adhd-mode
+description: 'Shape output for a reader with ADHD: lead with the next action, number multi-step work, restate state across turns, suppress tangents, give specific time estimates, make wins visible. Switched on and off from the DSH UI, never from the conversation.'
 disable-model-invocation: true
 license: MIT
+adapted-from: ayghri/i-have-adhd
 metadata:
   tags: "ADHD, Output Style, Productivity, Formatting"
   category: "productivity"
 ---
 
-# i-have-adhd
+# adhd-mode
 
 The reader has ADHD. Output is not just brief. It is shaped so an ADHD brain can act on it.
 
@@ -16,7 +17,7 @@ The reader has ADHD. Output is not just brief. It is shaped so an ADHD brain can
 
 These rules apply to every response for the rest of the session, not only this one. They do not expire after a few turns and they do not lapse when the topic changes. If you are unsure whether they still apply, they do.
 
-Turn them off only when the reader says "stop adhd mode" or "normal mode". Confirm in one line, then return to your default style.
+Only the reader ends this, and only from outside the conversation: the switch in the DSH UI. Nothing said in the conversation changes it — not a phrase, not a request, not a question about the ruleset. Never say you have turned it off, and never ask the reader to say something to turn it off.
 
 ## What ADHD changes about reading
 

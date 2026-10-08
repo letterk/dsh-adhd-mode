@@ -1,5 +1,5 @@
 /**
- * dsh-i-have-adhd — Host half.
+ * dsh-adhd-mode — Host half.
  *
  * DeepSeek Harness port of https://github.com/ayghri/i-have-adhd (MIT).
  *
@@ -31,10 +31,10 @@ import { readFileSync } from 'node:fs';
 import z from '@deepseek-ai/schemastery';
 
 /** Cordis service name; also the loader row id and the settings namespace. */
-export const name = 'i-have-adhd';
+export const name = 'adhd-mode';
 
 /** Settings namespace == the `cordis.patch.yml` row id == the ConfigForms entry id. */
-export const NS = 'i-have-adhd';
+export const NS = 'adhd-mode';
 
 /** `systemPrompt` is mandatory; it is the only service this half needs. */
 export const inject = ['systemPrompt'];
@@ -57,16 +57,11 @@ export const Config = z.object({
 // The ruleset itself
 // ---------------------------------------------------------------------------
 
-const SKILL_URL = new URL('./skills/i-have-adhd/SKILL.md', import.meta.url);
+const RULES_URL = new URL('./skills/adhd-mode/rules.md', import.meta.url);
 
-// The bundled ruleset is upstream's text, which still tells the reader to say a
-// phrase and the assistant to drop the mode on it. Nothing here can act on
-// that, so the banner says plainly where the switch actually is.
-const ACTIVE_BANNER =
-  'ADHD MODE ACTIVE. The ruleset below applies to every response. ' +
-  'The mode is switched from the UI; nothing in the conversation turns it on or off.';
+const ACTIVE_BANNER = 'ADHD MODE ACTIVE. The ruleset below applies to every response.';
 
-/** Used only if the bundled SKILL.md cannot be read (kept backtick-free on purpose). */
+/** Used only if the bundled rules.md cannot be read (kept backtick-free on purpose). */
 const FALLBACK_RULES = [
   'ADHD MODE ACTIVE.',
   '',
@@ -89,9 +84,9 @@ function stripFrontmatter(text) {
     .replace(/(?:\r?\n)+$/, '');
 }
 
-function loadSkillBody() {
+function loadRules() {
   try {
-    const body = stripFrontmatter(readFileSync(SKILL_URL, 'utf8'));
+    const body = stripFrontmatter(readFileSync(RULES_URL, 'utf8'));
     return body.length > 0 ? body : FALLBACK_RULES;
   } catch {
     return FALLBACK_RULES;
@@ -125,7 +120,7 @@ function num(value, fallback) {
 
 export function apply(ctx, config) {
   const options = config ?? {};
-  const skillBody = loadSkillBody();
+  const rules = loadRules();
 
   const isEnabled = () => bool(options.enabled, false);
 
@@ -136,8 +131,8 @@ export function apply(ctx, config) {
       ctx.systemPrompt.section({
         name: NS,
         order: num(options.order, 15),
-        text: () => (isEnabled() ? `${ACTIVE_BANNER}\n\n${skillBody}` : ''),
+        text: () => (isEnabled() ? `${ACTIVE_BANNER}\n\n${rules}` : ''),
       }),
-    'i-have-adhd: system-prompt hook',
+    'adhd-mode: system-prompt hook',
   );
 }

@@ -21,7 +21,7 @@ new Function(src)();
 
 check('__ModuleLoader__.load was called exactly once', loaded.length === 1, loaded.length);
 const mod = loaded[0];
-check('loader id equals package name', mod && mod.id === 'dsh-i-have-adhd', mod && mod.id);
+check('loader id equals package name', mod && mod.id === 'dsh-adhd-mode', mod && mod.id);
 check('factory is a function', mod && typeof mod.factory === 'function');
 
 // ---- stub React ----------------------------------------------------------
@@ -71,7 +71,7 @@ const ctx = {
       };
     },
   },
-  configForms: { get(entryId) { check('configForms.get received the patchId', entryId === 'i-have-adhd', entryId); return fakeForm(); } },
+  configForms: { get(entryId) { check('configForms.get received the patchId', entryId === 'adhd-mode', entryId); return fakeForm(); } },
   slots: {
     inject(root, cb) { injectedRoots.push(root); const d = cb(); return typeof d === 'function' ? d : () => {}; },
     register(def, comp) { registered.push({ def, comp }); return () => {}; },
@@ -82,11 +82,11 @@ let applyError = null;
 try { api.apply(ctx); } catch (err) { applyError = err; }
 check('apply() did not throw', applyError === null, applyError && String(applyError));
 
-check('locale dict registered for NS', Boolean(dicts['i-have-adhd']));
+check('locale dict registered for NS', Boolean(dicts['adhd-mode']));
 
 // ---- locale dictionary contract: Record<string, string> ------------------
 for (const loc of ['zh', 'en']) {
-  const table = dicts['i-have-adhd'] && dicts['i-have-adhd'][loc];
+  const table = dicts['adhd-mode'] && dicts['adhd-mode'][loc];
   if (!table) { check('dict ' + loc + ' exists', false); continue; }
   const bad = Object.entries(table).filter(([, v]) => typeof v !== 'string');
   check('dict ' + loc + ' values are all strings', bad.length === 0, bad);
@@ -102,7 +102,7 @@ const byRoot = {};
 injectedRoots.forEach((root, i) => { byRoot[root] = registered[i]; });
 
 for (const [root, entry] of Object.entries(byRoot)) {
-  check(root + ' registration id is i-have-adhd', entry.def.id === 'i-have-adhd', entry.def);
+  check(root + ' registration id is adhd-mode', entry.def.id === 'adhd-mode', entry.def);
   check(root + ' registration name matches root', entry.def.name === root, entry.def.name);
 }
 
@@ -140,8 +140,8 @@ const pillZh = renders['zh|conversation.composer.dock'];
 check('pill shows ADHD mode label (zh)', pillZh.includes('ADHD 模式'), pillZh);
 
 // ---- every key used by t() exists in both dictionaries ------------------
-const tableZh = dicts['i-have-adhd'].zh;
-const tableEn = dicts['i-have-adhd'].en;
+const tableZh = dicts['adhd-mode'].zh;
+const tableEn = dicts['adhd-mode'].en;
 const missingZh = [...usedKeys].filter((k) => !(k in tableZh));
 const missingEn = [...usedKeys].filter((k) => !(k in tableEn));
 check('no used key missing from zh dict', missingZh.length === 0, missingZh);

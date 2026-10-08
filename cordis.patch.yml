@@ -1,6 +1,6 @@
 - insert:
-    - id: i-have-adhd
-      name: 'dsh-i-have-adhd'
+    - id: adhd-mode
+      name: 'dsh-adhd-mode'
       config:
         enabled: false
         order: 15

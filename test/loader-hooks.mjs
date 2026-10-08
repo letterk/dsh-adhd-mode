@@ -5,12 +5,12 @@
 // the import fails and we fall back to the local stub instead of skipping the
 // test.
 //
-// Set DSH_I_HAVE_ADHD_STUB=1 to take the stub even when the real package is
+// Set DSH_ADHD_MODE_STUB=1 to take the stub even when the real package is
 // resolvable, which is how CI runs. Do that before pushing a change to the
 // schema or to anything the stub stands in for.
 
 const STUB = new URL('./schemastery-stub.mjs', import.meta.url).href;
-const FORCE_STUB = process.env.DSH_I_HAVE_ADHD_STUB === '1';
+const FORCE_STUB = process.env.DSH_ADHD_MODE_STUB === '1';
 
 export async function resolve(specifier, context, nextResolve) {
   if (specifier !== '@deepseek-ai/schemastery') return nextResolve(specifier, context);

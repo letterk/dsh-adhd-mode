@@ -1,5 +1,5 @@
 {
-  "name": "dsh-i-have-adhd",
+  "name": "dsh-adhd-mode",
   "version": "0.1.0",
   "description": "ADHD-friendly output style for DeepSeek Harness: a system-prompt hook, a live on/off switch, and a settings page.",
   "license": "MIT",
@@ -9,17 +9,18 @@
     "deepseek-harness",
     "cordis",
     "bundle",
+    "dsh-plugin",
     "plugin",
     "adhd",
     "system-prompt"
   ],
-  "homepage": "https://github.com/letterk/dsh-i-have-adhd#readme",
+  "homepage": "https://github.com/letterk/dsh-adhd-mode#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/letterk/dsh-i-have-adhd.git"
+    "url": "git+https://github.com/letterk/dsh-adhd-mode.git"
   },
   "bugs": {
-    "url": "https://github.com/letterk/dsh-i-have-adhd/issues"
+    "url": "https://github.com/letterk/dsh-adhd-mode/issues"
   },
   "engines": {
     "node": ">=22"
@@ -39,7 +40,7 @@
     "cordis.patch.yml",
     "icon.svg",
     "locale/*.json",
-    "skills/i-have-adhd/SKILL.md",
+    "skills/adhd-mode/rules.md",
     "test/",
     "README.md",
     "README.zh-CN.md",

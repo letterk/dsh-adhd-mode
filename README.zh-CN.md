@@ -1,8 +1,8 @@
-# dsh-i-have-adhd
+# dsh-adhd-mode
 
 给 [DeepSeek Harness](https://github.com/deepseek-ai/dsh) 用的 ADHD 输出风格。它往系统提示词里加一套规则，让回复更好执行：先给下一步动作、多步任务编号、每轮复述进度、不写开场白。会话跑着也能随时开关。
 
-移植自 [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)（MIT）。`skills/i-have-adhd/SKILL.md` 是上游原文，一字未改。
+移植自 [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)（MIT）。`skills/adhd-mode/rules.md` 是上游原文，只换掉了一段：上游靠读者说一句话关掉，而这个 bundle 没有要说的话（见[改动在哪](#改动在哪)）。
 
 [English](README.md)
 
@@ -16,10 +16,16 @@
 | 开关 | `~/.claude/` 下的标志文件 | `.volatile()` 配置字段，改完即生效并持久化 |
 | 界面 | 无 | 设置页 + 输入框旁的胶囊 |
 
+## 改动在哪
+
+规则集里只有 `## Persistence` 这一段不是上游原文。上游靠读者说 "stop adhd mode" 关掉，而且它的 `SessionStart` hook 会在会话开始、恢复、压缩时重新贴上规则。这两件事这里都做不到——Host 半边不匹配任何文本——所以那一段改成：开关在会话外面，会话里说什么都不会改变模式。`skills/adhd-mode/rules.md` 的其余部分是上游原文，frontmatter 也在，其中 `disable-model-invocation` 是空转的，因为这个 bundle 从不把这个文件注册成 skill。
+
+上游的规则集改动很慢（那个项目主要是给各家运行时做胶水），所以这里没有同步流程：这份是 fork，手工维护。
+
 ## 安装
 
 ```sh
-dsh plugin --profile web add github:letterk/dsh-i-have-adhd
+dsh plugin --profile web add github:letterk/dsh-adhd-mode
 ```
 
 就这一行。`dsh plugin` 把后面的参数原样转成 profile 目录里的 pnpm 命令，下次启动时任何声明了 `dsh.bundle` 的新依赖会被自动提升为 profile 层，不需要再单独启用。装完重启 profile。
@@ -27,11 +33,11 @@ dsh plugin --profile web add github:letterk/dsh-i-have-adhd
 pnpm 认的其他 spec：
 
 ```sh
-dsh plugin --profile web add file:/path/to/dsh-i-have-adhd
-dsh plugin --profile web remove dsh-i-have-adhd
+dsh plugin --profile web add file:/path/to/dsh-adhd-mode
+dsh plugin --profile web remove dsh-adhd-mode
 ```
 
-npm 上那个裸名 `dsh-i-have-adhd` 不是这个项目（被另一个插件占了），所以装的时候用仓库 spec。
+`dsh-adhd-mode` 这个名字在 npm 上没人占，但本项目没发布到 npm，所以装的时候用仓库 spec。
 
 要装的是你打算改的工作区，需要多一步，见 [就地编辑安装](#就地编辑安装)。
 
@@ -58,16 +64,16 @@ npm 上那个裸名 `dsh-i-have-adhd` 不是这个项目（被另一个插件占
 ## 文件
 
 ```
-index.js                       Host 半边：系统提示词 hook
-client.js                      Client 半边：胶囊和设置页
-cordis.patch.yml               插入插件的 loader 行
-skills/i-have-adhd/SKILL.md    上游的规则集
-locale/{en,zh}.json            bundle 的标题和描述
-icon.svg                       bundle 图标
-test/host.mjs                  Host 自测
-test/client.mjs                Client 自测，React 用桩
-test/loader-hooks.mjs          裸仓库里把 schemastery 的导入指到桩
-test/schemastery-stub.mjs      @deepseek-ai/schemastery 的最小替身
+index.js                        Host 半边：系统提示词 hook
+client.js                       Client 半边：胶囊和设置页
+cordis.patch.yml                插入插件的 loader 行
+skills/adhd-mode/rules.md       上游的规则集
+locale/{en,zh}.json             bundle 的标题和描述
+icon.svg                        bundle 图标
+test/host.mjs                   Host 自测
+test/client.mjs                 Client 自测，React 用桩
+test/loader-hooks.mjs           裸仓库里把 schemastery 的导入指到桩
+test/schemastery-stub.mjs       @deepseek-ai/schemastery 的最小替身
 ```
 
 ## 开发
@@ -83,7 +89,7 @@ npm test
 Host 测试能解析到真实的 `@deepseek-ai/schemastery` 时就用真的，解析不到就用 `test/schemastery-stub.mjs`，CI、裸仓库，以及没有链入 profile 依赖的检出都走后者。想强行走桩：
 
 ```sh
-DSH_I_HAVE_ADHD_STUB=1 npm test
+DSH_ADHD_MODE_STUB=1 npm test
 ```
 
 ### 就地编辑安装
@@ -91,13 +97,13 @@ DSH_I_HAVE_ADHD_STUB=1 npm test
 `file:` 装进去的是副本，profile 会一直用安装时那一版。想让 profile 直接读你的工作区，就改用 link：
 
 ```sh
-dsh plugin --profile web add link:/path/to/dsh-i-have-adhd
+dsh plugin --profile web add link:/path/to/dsh-adhd-mode
 ```
 
 被链接的 bundle 从它自己的目录被导入，裸导入也就从那里解析，而不是从 profile。所以要给这个 checkout 一个能走到 harness 包的 `node_modules`：
 
 ```sh
-cd /path/to/dsh-i-have-adhd
+cd /path/to/dsh-adhd-mode
 mkdir -p node_modules
 ln -sfn ~/.dsh/profiles/web/node_modules/@deepseek-ai node_modules/@deepseek-ai
 ```
@@ -109,10 +115,10 @@ ln -sfn ~/.dsh/profiles/web/node_modules/@deepseek-ai node_modules/@deepseek-ai
 在 harness 会话里做实时检查：
 
 ```
-cordis_inspect_query host/Config  listConfigs  {"entry":"include:i-have-adhd"}
+cordis_inspect_query host/Config  listConfigs  {"entry":"include:adhd-mode"}
 cordis_inspect_query client/Slots listSubTree {"root":"settings.section"}
 ```
 
 ## 许可证
 
-MIT。`skills/i-have-adhd/SKILL.md` 以及它背后的设计来自 [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)（作者 Ayoub Ghriss），其余代码属于本项目。
+MIT。`skills/adhd-mode/rules.md` 以及它背后的设计来自 [ayghri/i-have-adhd](https://github.com/ayghri/i-have-adhd)（作者 Ayoub Ghriss），其余代码属于本项目。

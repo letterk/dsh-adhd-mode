@@ -1,5 +1,5 @@
 /**
- * dsh-i-have-adhd — client half.
+ * dsh-adhd-mode — client half.
  *
  * Renders the ADHD output-mode switch in two places and writes through to the
  * Host's volatile Config:
@@ -12,7 +12,7 @@
  * is required and no other plugin's DOM is touched.
  */
 window.__ModuleLoader__.load({
-  id: 'dsh-i-have-adhd',
+  id: 'dsh-adhd-mode',
   factory: (require) => {
     var module = { exports: {} };
     var exports = module.exports;
@@ -20,14 +20,14 @@ window.__ModuleLoader__.load({
     const React = require('react');
 
     /** Must equal `NS` in index.js: locale namespace, settings namespace, slot id. */
-    const NS = 'i-have-adhd';
+    const NS = 'adhd-mode';
     /** The Host plugin entry id (`cordis.patch.yml` row id) used by configForms.get(). */
-    const ENTRY_ID = 'i-have-adhd';
+    const ENTRY_ID = 'adhd-mode';
     /** The single volatile Config field we expose. */
     const FIELD = 'enabled';
 
     // ----------------------------------------------------------------- styles
-    const STYLE_TAG = 'dsh-i-have-adhd';
+    const STYLE_TAG = 'dsh-adhd-mode';
 
     // Locale dictionaries are Record<string, string>, so the rule list is held as
     // ten flat keys and assembled here.
@@ -236,7 +236,7 @@ window.__ModuleLoader__.load({
         function () {
           return ctx.locale.register(NS, DICT);
         },
-        'i-have-adhd: locale',
+        'adhd-mode: locale',
       );
 
       const t = ctx.locale.bind(NS);
@@ -248,7 +248,7 @@ window.__ModuleLoader__.load({
             controller.dispose();
           };
         },
-        'i-have-adhd: controller',
+        'adhd-mode: controller',
       );
 
       function useToggle() {
@@ -375,7 +375,7 @@ window.__ModuleLoader__.load({
             );
           });
         },
-        'i-have-adhd: composer pill',
+        'adhd-mode: composer pill',
       );
 
       ctx.effect(
@@ -394,7 +394,7 @@ window.__ModuleLoader__.load({
             );
           });
         },
-        'i-have-adhd: settings page',
+        'adhd-mode: settings page',
       );
     }
 
