@@ -1,0 +1,81 @@
+name: upstream sync
+
+# The ruleset is upstream's, verbatim. Check daily whether it moved, and land the
+# change here if it did.
+#
+# This pushes straight to main. Want a review gate instead? Replace the commit step
+# with `gh pr create --fill` (and give the job `pull-requests: write`).
+
+on:
+  schedule:
+    - cron: "0 22 * * *" # 06:00 Asia/Shanghai
+  workflow_dispatch:
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      UPSTREAM: ayghri/i-have-adhd
+      UPSTREAM_PATH: skills/i-have-adhd/SKILL.md
+      LOCAL_PATH: skills/i-have-adhd/SKILL.md
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Compare with upstream
+        id: check
+        env:
+          TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          curl -fsSL -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github.raw" \
+            "https://api.github.com/repos/$UPSTREAM/contents/$UPSTREAM_PATH" \
+            -o "$RUNNER_TEMP/upstream.md"
+          if cmp -s "$RUNNER_TEMP/upstream.md" "$LOCAL_PATH"; then
+            echo "Ruleset already matches upstream." >> "$GITHUB_STEP_SUMMARY"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          sha=$(curl -fsSL -H "Authorization: Bearer $TOKEN" \
+            "https://api.github.com/repos/$UPSTREAM/commits?path=$UPSTREAM_PATH&per_page=1" \
+            | jq -r '.[0].sha')
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          {
+            echo "Upstream moved to \`${sha:0:7}\`:"
+            echo
+            echo '```diff'
+            diff -u "$LOCAL_PATH" "$RUNNER_TEMP/upstream.md" | head -n 200 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Take the upstream file
+        if: steps.check.outputs.changed == 'true'
+        run: cp "$RUNNER_TEMP/upstream.md" "$LOCAL_PATH"
+
+      - name: Check the port still holds
+        if: steps.check.outputs.changed == 'true'
+        run: npm test
+
+      - name: Commit
+        if: steps.check.outputs.changed == 'true'
+        env:
+          SHA: ${{ steps.check.outputs.sha }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$LOCAL_PATH"
+          git commit -m "chore: sync the ruleset with $UPSTREAM@${SHA:0:7}" \
+            -m "https://github.com/$UPSTREAM/commit/$SHA"
+          git push
