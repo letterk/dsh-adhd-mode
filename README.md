@@ -80,6 +80,12 @@ npm test
 
 Neither test needs DSH, a browser, or `npm install`.
 
+The host test uses the real `@deepseek-ai/schemastery` when it resolves, and `test/schemastery-stub.mjs` when it does not — which is the case in CI, a fresh clone, and any checkout without the profile's packages linked in. Take the stub path on purpose with:
+
+```sh
+DSH_I_HAVE_ADHD_STUB=1 npm test
+```
+
 ### Live-edit install
 
 `file:` installs a copy, so the profile keeps the revision it was installed from. To have the profile read your working tree directly, link it instead:

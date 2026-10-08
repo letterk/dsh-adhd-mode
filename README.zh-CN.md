@@ -80,6 +80,12 @@ npm test
 
 两个测试都不需要 DSH、不需要浏览器，也不需要 `npm install`。
 
+Host 测试能解析到真实的 `@deepseek-ai/schemastery` 时就用真的，解析不到就用 `test/schemastery-stub.mjs`，CI、裸仓库，以及没有链入 profile 依赖的检出都走后者。想强行走桩：
+
+```sh
+DSH_I_HAVE_ADHD_STUB=1 npm test
+```
+
 ### 就地编辑安装
 
 `file:` 装进去的是副本，profile 会一直用安装时那一版。想让 profile 直接读你的工作区，就改用 link：

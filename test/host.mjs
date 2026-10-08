@@ -25,6 +25,20 @@ check('inject is exactly [systemPrompt]', JSON.stringify(mod.inject) === JSON.st
 check('Config schema exported', typeof mod.Config === 'function', typeof mod.Config);
 check('apply exported', typeof mod.apply === 'function');
 
+// ---- Config: the two fields the UI and the section rely on ---------------
+{
+  const defaults = mod.Config({});
+  const enabled = defaults.enabled;
+  const readable = enabled && typeof enabled.get === 'function' ? enabled.get() : enabled;
+  check('Config resolves enabled to false by default', readable === false, enabled);
+  check('Config resolves order to 15 by default', defaults.order === 15, defaults.order);
+  check(
+    'Config declares only enabled and order',
+    Object.keys(defaults).sort().join(',') === 'enabled,order',
+    Object.keys(defaults),
+  );
+}
+
 // ---- the Host half owns no control surface -------------------------------
 // The switch lives in the UI; nothing here parses what the reader typed, and
 // nothing here writes config. These checks fail the moment any of that returns.
