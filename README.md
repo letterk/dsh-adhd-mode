@@ -19,31 +19,32 @@ Upstream is a set of glue scripts, one per runtime. On Claude Code it registers 
 ## Install
 
 ```sh
-dsh plugin --profile web add dsh-i-have-adhd
+dsh plugin --profile web add github:letterk/dsh-i-have-adhd
 ```
 
 That is the whole install. `dsh plugin` forwards the rest of the line to pnpm inside the profile, and the next boot promotes any new dependency that declares `dsh.bundle` to a profile layer on its own — there is no second step. Restart the profile afterwards.
 
-Any spec pnpm accepts works:
+Other specs pnpm accepts:
 
 ```sh
-dsh plugin --profile web add github:letterk/dsh-i-have-adhd
 dsh plugin --profile web add file:/path/to/dsh-i-have-adhd
 dsh plugin --profile web remove dsh-i-have-adhd
 ```
+
+The bare name `dsh-i-have-adhd` is not this project on npm — an unrelated plugin holds it — so install by repository spec.
 
 Installing from a working tree you intend to edit takes one extra step: see [live-edit install](#live-edit-install).
 
 ## Use
 
-| Input | Effect |
+Two places, both in the Web UI:
+
+| Where | What |
 | --- | --- |
-| `/adhd on`, `/adhd off` | set the mode |
-| `/adhd toggle`, `/adhd status` | flip it, read it |
-| the pill next to the composer | set the mode |
-| Settings → ADHD output mode | set the mode |
-| `/i-have-adhd` in a message | turn it on |
-| `stop adhd mode`, `关闭adhd`, `正常模式` | turn it off |
+| the pill next to the composer | click to flip |
+| Settings → ADHD output mode | the switch on the page |
+
+The change lands on the next model step and is written to the profile's config, so it survives a restart. There is no command, no tool and nothing to type — the UI is the only control, and the only place to look when the mode is not doing what you expected.
 
 The switch is profile-wide, not per session. DSH's `PromptSection` takes no session key, so there is nowhere to store whether the mode was on in one particular session.
 
@@ -51,15 +52,13 @@ The switch is profile-wide, not per session. DSH's `PromptSection` takes no sess
 
 | Key | Default | Meaning |
 | --- | --- | --- |
-| `enabled` | `false` | volatile; the live switch |
+| `enabled` | `false` | volatile; the switch the UI writes |
 | `order` | `15` | position of the section in the system prompt |
-| `registerSkill` | `true` | also publish the ruleset as a user-invocable skill |
-| `honorStopPhrase` | `true` | let the stop phrases turn the mode off |
 
 ## Files
 
 ```
-index.js                       host half: hook, switch, command, gesture listener, skill
+index.js                       host half: the system-prompt hook
 client.js                      client half: composer pill and settings page
 cordis.patch.yml               loader row that inserts the plugin
 skills/i-have-adhd/SKILL.md    the ruleset, from upstream
@@ -77,7 +76,7 @@ test/schemastery-stub.mjs      minimal stand-in for @deepseek-ai/schemastery
 npm test
 ```
 
-`test/host.mjs` loads `index.js` against a fake Cordis context and checks the section, skill, command and listener registrations, the whole `/adhd` argument table, every stop phrase, and the failed-write path. `test/client.mjs` loads `client.js` against stub browser globals and a stub React, then renders both seats in `zh` and `en`.
+`test/host.mjs` loads `index.js` against a fake Cordis context and checks that the section registers, that the ruleset appears only while the switch is on, and that the Host half exposes no command, tool or phrase matching. `test/client.mjs` loads `client.js` against stub browser globals and a stub React, then renders both seats in `zh` and `en`.
 
 Neither test needs DSH, a browser, or `npm install`.
 

@@ -4,5 +4,3 @@
       config:
         enabled: false
         order: 15
-        registerSkill: true
-        honorStopPhrase: true

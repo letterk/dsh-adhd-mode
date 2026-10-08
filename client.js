@@ -117,9 +117,9 @@ window.__ModuleLoader__.load({
         rule8: '报错时语气平实，不道歉。',
         rule9: '列表最多 5 条。',
         rule10: '不写开场白、不写回顾、不写客套收尾。',
-        usageTitle: '调用方式',
+        usageTitle: '开关在哪',
         usage:
-          '命令：/adhd on | off | toggle | status　·　手势：发送 /i-have-adhd　·　关闭：说 “stop adhd mode”',
+          '两个地方：这一页，和输入框右侧的胶囊。改动立即生效，并写入配置长期保留。',
       },
       en: {
         title: 'ADHD output mode',
@@ -145,9 +145,9 @@ window.__ModuleLoader__.load({
         rule8: 'Matter-of-fact tone for errors.',
         rule9: 'Cap lists to 5 items.',
         rule10: 'No preamble, no recap, no closing pleasantries.',
-        usageTitle: 'How to invoke',
+        usageTitle: 'Where the switch lives',
         usage:
-          'Command: /adhd on | off | toggle | status · Gesture: send /i-have-adhd · Off: say "stop adhd mode"',
+          'Two places: this page, and the pill beside the composer. A flip applies immediately and is written to config.',
       },
     };
 
