@@ -78,6 +78,12 @@ test/loader-hooks.mjs           points the schemastery import at the stub in a b
 test/schemastery-stub.mjs       minimal stand-in for @deepseek-ai/schemastery
 ```
 
+## Versions
+
+`package.json` holds the version, `CHANGELOG.md` records what changed in it, and every released version is a `vX.Y.Z` git tag with a GitHub release beside it. The plugin market reads the version out of `package.json`, so the number here is what the listing shows.
+
+This project is not published to npm, so nothing depends on the number for resolution — but a tag is the only immutable pointer to "the code a reader had", and without one a reported bug cannot be pinned to a revision.
+
 ## Development
 
 ```sh

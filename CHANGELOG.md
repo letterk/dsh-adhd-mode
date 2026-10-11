@@ -4,6 +4,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-11
+
 ### Fixed
 
 - The ruleset no longer reaches subagents. The section was registered on the plugin's own context, which is global: every agent the Host assembled a prompt for received it, delegated children included. It is now registered per agent on `agent.ctx`, and skipped for any agent carrying a delegation depth (`origin: 'subagent'`, `header.delegationDepth > 0`, or `options.subagentDepth > 0`). A forked session still gets it — `parentSession` records fork lineage, not delegation.
@@ -32,5 +34,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - The Host half exposes no command, tool, or natural-language matching. The UI switch is the only way to change the mode.
 
-[Unreleased]: https://github.com/letterk/dsh-adhd-mode/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/letterk/dsh-adhd-mode/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/letterk/dsh-adhd-mode/releases/tag/v0.2.0
 [0.1.0]: https://github.com/letterk/dsh-adhd-mode/releases/tag/v0.1.0

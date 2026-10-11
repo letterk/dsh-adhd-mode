@@ -78,6 +78,12 @@ test/loader-hooks.mjs           裸仓库里把 schemastery 的导入指到桩
 test/schemastery-stub.mjs       @deepseek-ai/schemastery 的最小替身
 ```
 
+## 版本
+
+版本号在 `package.json`，改了什么记在 `CHANGELOG.md`，每个发布过的版本对应一个 `vX.Y.Z` 的 git tag 和一个 GitHub release。插件市场的版本号是从 `package.json` 里读的，所以这里写什么，列表页就显示什么。
+
+这个项目没有发到 npm，所以版本号不参与依赖解析——但 tag 是"读者当时拿到的是哪份代码"的唯一不可变指针，没有它就没法把一个 bug 报告钉到某个 revision 上。
+
 ## 开发
 
 ```sh
