@@ -4,6 +4,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Fixed
+
+- The ruleset no longer reaches subagents. The section was registered on the plugin's own context, which is global: every agent the Host assembled a prompt for received it, delegated children included. It is now registered per agent on `agent.ctx`, and skipped for any agent carrying a delegation depth (`origin: 'subagent'`, `header.delegationDepth > 0`, or `options.subagentDepth > 0`). A forked session still gets it — `parentSession` records fork lineage, not delegation.
+
 ### Changed
 
 - Renamed the project from `dsh-i-have-adhd` to `dsh-adhd-mode` — that name is unoccupied on npm and in the plugin market, whereas the old one belongs to an unrelated plugin. The loader row id, the settings namespace and the bundled ruleset path follow the new name.

@@ -12,7 +12,7 @@
 
 | 能力 | 上游 | 这里 |
 | --- | --- | --- |
-| hook | `SessionStart` hook | `ctx.systemPrompt.section()`，`text` 用动态函数 |
+| hook | `SessionStart` hook | 挂在 `agent.ctx` 上的 `systemPrompt.section()`，`text` 用动态函数 |
 | 开关 | `~/.claude/` 下的标志文件 | `.volatile()` 配置字段，改完即生效并持久化 |
 | 界面 | 无 | 设置页 + 输入框工具栏里的 ADHD 按钮 |
 
@@ -54,6 +54,8 @@ dsh plugin --profile web remove dsh-adhd-mode
 
 开关是全局的，不分会话。DSH 的 `PromptSection` 不接受会话参数，没地方存"这个会话开没开"。
 
+有作用域的是注入本身。这个 section 注册在 agent 自己的上下文上，而不是插件的上下文上，所以规则只到读者正在对话的那个 agent，不会再往下走。被委派出去的子代理——凡是带委派深度的，包括专家团的成员——加入的是父级的 preset，装配时用的是自己的 persona 和工具集，不会带上这个 section。而从别的会话 fork 出来的会话是读者主动开的顶层 agent，它会拿到这个 section。
+
 ## 配置
 
 | 键 | 默认 | 说明 |
@@ -82,7 +84,7 @@ test/schemastery-stub.mjs       @deepseek-ai/schemastery 的最小替身
 npm test
 ```
 
-`test/host.mjs` 用一个假的 Cordis context 加载 `index.js`，检查 section 注册、规则只在开关打开时出现，以及 Host 半边没有暴露任何命令、工具或短语匹配。`test/client.mjs` 用桩浏览器全局量和桩 React 加载 `client.js`，在 `zh` 和 `en` 下各渲染一遍两个座位。
+`test/host.mjs` 用一个假的 Cordis context 加载 `index.js`，检查每个顶层 agent 只注册一个 section、被委派的子代理一个都拿不到而 fork 出来的还能拿到、规则只在开关打开时出现，以及 Host 半边没有暴露任何命令、工具或短语匹配。`test/client.mjs` 用桩浏览器全局量和桩 React 加载 `client.js`，在 `zh` 和 `en` 下各渲染一遍两个座位。
 
 两个测试都不需要 DSH、不需要浏览器，也不需要 `npm install`。
 

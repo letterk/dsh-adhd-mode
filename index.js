@@ -8,11 +8,19 @@
  * (`~/.claude/.i-have-adhd-always`). DSH has neither, so this bundle supplies
  * the equivalents:
  *
- *   hook   — the ruleset rides `ctx.systemPrompt.section()` with a dynamic
- *            `text` thunk. dsh-system-prompt re-evaluates that thunk at every
+ *   hook   — the ruleset rides `systemPrompt.section()` with a dynamic `text`
+ *            thunk. dsh-system-prompt re-evaluates that thunk at every
  *            assembly (lib/index.js:342) and drops sections whose text is empty
  *            (lib/index.js:114), so the section follows the switch with no
  *            restart and no re-registration.
+ *
+ *            The section is registered on the AGENT's context, not the
+ *            profile's: a global section reaches every agent the Host ever
+ *            assembles a prompt for, including the subagents a delegation
+ *            spawns. `agent.ctx` scopes the contribution to that one agent
+ *            (dsh-system-prompt README, "Scoping"), which is what keeps the
+ *            ruleset on the agent the reader is talking to. Children are
+ *            skipped by delegation depth — see `isSubagent`.
  *   switch — `enabled` is a `.volatile()` Config field. The Loader hands the
  *            plugin a live reference whose `.get()` always returns the current
  *            value, so flipping it takes effect on the very next assembly and
@@ -36,8 +44,8 @@ export const name = 'adhd-mode';
 /** Settings namespace == the `cordis.patch.yml` row id == the ConfigForms entry id. */
 export const NS = 'adhd-mode';
 
-/** `systemPrompt` is mandatory; it is the only service this half needs. */
-export const inject = ['systemPrompt'];
+/** `systemPrompt` renders the section; `agents` is how a top-level agent is found. */
+export const inject = ['systemPrompt', 'agents'];
 
 export const Config = z.object({
   enabled: z
@@ -114,6 +122,27 @@ function num(value, fallback) {
   return typeof resolved === 'number' && Number.isFinite(resolved) ? resolved : fallback;
 }
 
+/**
+ * Whether this agent is a delegated child rather than the agent the reader
+ * talks to.
+ *
+ * `delegationDepth` is the authoritative mark: dsh-subagent stamps it as
+ * parent + 1 at creation and persists it in the session header, so it survives
+ * restart and resume (a runtime-only depth would let a resumed child read as
+ * top-level). `origin: 'subagent'` is the same fact spelled for presentation,
+ * and `options.subagentDepth` is the runtime copy. A forked session is NOT a
+ * child — `header.parentSession` records fork lineage and a fork is a
+ * top-level agent the reader opened on purpose, so it is deliberately not a
+ * test here.
+ */
+function isSubagent(agent) {
+  const header = agent?.session?.header ?? {};
+  if (header.origin === 'subagent') return true;
+  if (typeof header.delegationDepth === 'number' && header.delegationDepth > 0) return true;
+  const runtime = agent?.options?.subagentDepth;
+  return typeof runtime === 'number' && runtime > 0;
+}
+
 // ---------------------------------------------------------------------------
 // Plugin
 // ---------------------------------------------------------------------------
@@ -124,15 +153,39 @@ export function apply(ctx, config) {
 
   const isEnabled = () => bool(options.enabled, false);
 
-  // The hook: a dynamic system-prompt section. `enabled` is read on every
-  // assembly, so the switch needs no restart, no remount and no second writer.
-  ctx.effect(
-    () =>
-      ctx.systemPrompt.section({
+  // The hook: one dynamic system-prompt section per top-level agent. `enabled`
+  // is read on every assembly, so the switch needs no restart, no remount and
+  // no second writer; the section exists only on agents that are not delegated
+  // children, so a subagent never carries the ruleset.
+  const installed = new Map();
+
+  const install = (agent) => {
+    if (installed.has(agent) || isSubagent(agent)) return;
+    const scoped = agent.ctx;
+    installed.set(
+      agent,
+      scoped.systemPrompt.section({
         name: NS,
         order: num(options.order, 15),
         text: () => (isEnabled() ? `${ACTIVE_BANNER}\n\n${rules}` : ''),
       }),
+    );
+  };
+
+  // Agents already live when the plugin loads, then every later publication.
+  for (const agent of ctx.agents.list()) install(agent);
+  ctx.on('agent/created', ({ agent }) => {
+    install(agent);
+  });
+  ctx.on('agent/disposed', ({ agent }) => {
+    installed.get(agent)?.();
+    installed.delete(agent);
+  });
+  ctx.effect(
+    () => () => {
+      for (const dispose of installed.values()) dispose();
+      installed.clear();
+    },
     'adhd-mode: system-prompt hook',
   );
 }

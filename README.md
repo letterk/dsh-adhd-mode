@@ -12,7 +12,7 @@ Upstream is a set of glue scripts, one per runtime. On Claude Code it registers 
 
 | Piece | Upstream | Here |
 | --- | --- | --- |
-| hook | `SessionStart` hook | `ctx.systemPrompt.section()` with a dynamic `text` |
+| hook | `SessionStart` hook | an `agent.ctx`-scoped `systemPrompt.section()` with a dynamic `text` |
 | switch | flag file under `~/.claude/` | a `.volatile()` config field, live and persisted |
 | page | none | a settings page and an icon+label trigger in the composer tool row |
 
@@ -54,6 +54,8 @@ The change lands on the next model step and is written to the profile's config, 
 
 The switch is profile-wide, not per session. DSH's `PromptSection` takes no session key, so there is nowhere to store whether the mode was on in one particular session.
 
+What *is* scoped is the injection. The section is registered on the agent's own context rather than the plugin's, so the ruleset reaches the agent the reader is talking to and stops there. A delegated child — anything spawned with a delegation depth, which includes Agent Teams teammates — joins its parent's preset and assembles with its own persona and tool set, never with this section. A session forked from another is a top-level agent the reader opened on purpose, so it does get the section.
+
 ## Config
 
 | Key | Default | Meaning |
@@ -82,7 +84,7 @@ test/schemastery-stub.mjs       minimal stand-in for @deepseek-ai/schemastery
 npm test
 ```
 
-`test/host.mjs` loads `index.js` against a fake Cordis context and checks that the section registers, that the ruleset appears only while the switch is on, and that the Host half exposes no command, tool or phrase matching. `test/client.mjs` loads `client.js` against stub browser globals and a stub React, then renders both seats in `zh` and `en`.
+`test/host.mjs` loads `index.js` against a fake Cordis context and checks that exactly one section registers per top-level agent, that a delegated child gets none while a fork still gets one, that the ruleset appears only while the switch is on, and that the Host half exposes no command, tool or phrase matching. `test/client.mjs` loads `client.js` against stub browser globals and a stub React, then renders both seats in `zh` and `en`.
 
 Neither test needs DSH, a browser, or `npm install`.
 
