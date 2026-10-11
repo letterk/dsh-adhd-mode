@@ -1,6 +1,6 @@
 {
   "name": "dsh-adhd-mode",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "ADHD-friendly output style for DeepSeek Harness: a system-prompt hook, a live on/off switch, and a settings page.",
   "license": "MIT",
   "author": "letterk",

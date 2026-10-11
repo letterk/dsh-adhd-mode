@@ -4,6 +4,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-11
+
 ### Added
 
 - `scripts/release.mjs` and `npm run release -- patch|minor|major`: bumps `package.json`, freezes the `[Unreleased]` entries into a dated section, rewrites the link references, runs the tests, and commits and pushes the tag in one step.
@@ -41,6 +43,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 - The Host half exposes no command, tool, or natural-language matching. The UI switch is the only way to change the mode.
 
-[Unreleased]: https://github.com/letterk/dsh-adhd-mode/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/letterk/dsh-adhd-mode/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/letterk/dsh-adhd-mode/releases/tag/v0.2.1
 [0.2.0]: https://github.com/letterk/dsh-adhd-mode/releases/tag/v0.2.0
 [0.1.0]: https://github.com/letterk/dsh-adhd-mode/releases/tag/v0.1.0
