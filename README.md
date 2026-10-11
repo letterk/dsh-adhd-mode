@@ -76,13 +76,28 @@ test/host.mjs                   host self-test
 test/client.mjs                 client self-test, stub React
 test/loader-hooks.mjs           points the schemastery import at the stub in a bare checkout
 test/schemastery-stub.mjs       minimal stand-in for @deepseek-ai/schemastery
+scripts/release.mjs             version bump, changelog freeze, tag; CI uses verify/notes
 ```
 
 ## Versions
 
-`package.json` holds the version, `CHANGELOG.md` records what changed in it, and every released version is a `vX.Y.Z` git tag with a GitHub release beside it. The plugin market reads the version out of `package.json`, so the number here is what the listing shows.
+[Semantic versioning](https://semver.org/spec/v2.0.0.html). The compatibility surface is small — the loader row id and the settings namespace, the two strings a profile stores — so the rules are about what an existing install would have to do:
 
-This project is not published to npm, so nothing depends on the number for resolution — but a tag is the only immutable pointer to "the code a reader had", and without one a reported bug cannot be pinned to a revision.
+| Bump | When |
+| --- | --- |
+| MAJOR | an install has to be redone: the loader row id or the settings namespace changes, a config field disappears, or the bundle needs a newer DSH |
+| MINOR | the reader gets something new, or the injection changes: a new seat, a new config field, a new language, a different prompt section |
+| PATCH | a fix nobody has to react to: ruleset wording, docs, tests, internal refactors |
+
+`package.json` holds the version, `CHANGELOG.md` records what is in it, and `[Unreleased]` accumulates until it is frozen. Cutting a release is one command:
+
+```sh
+npm run release -- patch    # or minor / major
+```
+
+That bumps the version, turns the `[Unreleased]` entries into a dated section, runs the tests, commits, and pushes the tag. `.github/workflows/release.yml` then publishes the GitHub release from that section. CI refuses a tag that disagrees with `package.json`, and a `doctor` job refuses a version that no changelog section explains.
+
+The plugin market reads the version out of `package.json`, so the number here is what a listing shows. This project is not published to npm, so nothing depends on the number for resolution — but the tag is the only immutable pointer to "the code a reader had".
 
 ## Development
 

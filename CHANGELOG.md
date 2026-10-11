@@ -4,6 +4,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and
 
 ## [Unreleased]
 
+### Added
+
+- `scripts/release.mjs` and `npm run release -- patch|minor|major`: bumps `package.json`, freezes the `[Unreleased]` entries into a dated section, rewrites the link references, runs the tests, and commits and pushes the tag in one step.
+- `.github/workflows/release.yml`: a pushed `vX.Y.Z` tag is checked against `package.json` and `CHANGELOG.md`, the tests run, and a GitHub release is published with that changelog section as its notes.
+- A `policy` job in CI (`node scripts/release.mjs doctor`) that fails when the version, the latest tag and the changelog disagree.
+- A Versions section in both READMEs stating the semantic-versioning policy for this bundle.
+
 ## [0.2.0] - 2026-10-11
 
 ### Fixed

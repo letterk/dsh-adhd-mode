@@ -6,6 +6,18 @@ on:
   pull_request:
 
 jobs:
+  policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Version, changelog and latest tag agree
+        run: node scripts/release.mjs doctor
+
   test:
     runs-on: ubuntu-latest
     strategy:

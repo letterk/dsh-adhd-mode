@@ -41,6 +41,7 @@
     "icon.svg",
     "locale/*.json",
     "skills/adhd-mode/rules.md",
+    "scripts/release.mjs",
     "test/",
     "README.md",
     "README.zh-CN.md",
@@ -48,7 +49,9 @@
     "LICENSE"
   ],
   "scripts": {
-    "test": "node test/host.mjs && node test/client.mjs"
+    "test": "node test/host.mjs && node test/client.mjs",
+    "release": "node scripts/release.mjs bump",
+    "release:doctor": "node scripts/release.mjs doctor"
   },
   "dsh": {
     "bundle": {

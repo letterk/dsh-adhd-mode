@@ -76,13 +76,28 @@ test/host.mjs                   Host 自测
 test/client.mjs                 Client 自测，React 用桩
 test/loader-hooks.mjs           裸仓库里把 schemastery 的导入指到桩
 test/schemastery-stub.mjs       @deepseek-ai/schemastery 的最小替身
+scripts/release.mjs             改版本号、冻结 changelog、打 tag；CI 用 verify/notes
 ```
 
 ## 版本
 
-版本号在 `package.json`，改了什么记在 `CHANGELOG.md`，每个发布过的版本对应一个 `vX.Y.Z` 的 git tag 和一个 GitHub release。插件市场的版本号是从 `package.json` 里读的，所以这里写什么，列表页就显示什么。
+[语义化版本](https://semver.org/lang/zh-CN/)。兼容面很小——loader 的 row id 和 settings 命名空间这两个字符串是 profile 里存下来的——所以规则围着"已经装好的人要不要动手"转：
 
-这个项目没有发到 npm，所以版本号不参与依赖解析——但 tag 是"读者当时拿到的是哪份代码"的唯一不可变指针，没有它就没法把一个 bug 报告钉到某个 revision 上。
+| 递增 | 什么时候 |
+| --- | --- |
+| MAJOR | 已经装的得重来一遍：loader row id 或 settings 命名空间变了、配置字段没了、或者要求更新的 DSH |
+| MINOR | 读者拿到了新东西，或者注入行为变了：新座位、新配置字段、新语言、不同的提示词段落 |
+| PATCH | 没人需要反应的修复：规则措辞、文档、测试、内部重构 |
+
+版本号在 `package.json`，这一版里有什么记在 `CHANGELOG.md`，`[Unreleased]` 一直攒到被冻结。切一版是一条命令：
+
+```sh
+npm run release -- patch    # 或 minor / major
+```
+
+它会改版本号、把 `[Unreleased]` 的内容变成带日期的段落、跑测试、提交并推 tag。然后 `.github/workflows/release.yml` 按那个段落发布 GitHub release。CI 会拒绝和 `package.json` 对不上的 tag，`doctor` 任务会拒绝没有 changelog 段落解释的版本号。
+
+插件市场的版本号是从 `package.json` 里读的，所以这里写什么，列表页就显示什么。这个项目没有发到 npm，版本号不参与依赖解析——但 tag 是"读者当时拿到的是哪份代码"的唯一不可变指针。
 
 ## 开发
 
